@@ -16,7 +16,7 @@ public class IntNode extends Node {
    *  @param children a list of children for the internal node
    */
   public IntNode(List<Node> children) {
-    super(Geometry.intervalFromNodes(children));
+    super(Geometry.intervalFromNodes(children), Hash.fromNodes(children));
     this.children = children;
   }
 

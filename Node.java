@@ -8,20 +8,33 @@ public abstract class Node {
 	/**
 	 *
 	 */
-	private final Interval i;
+	private final Interval range;
 
 	/**
-	 *	
+	 *	The cryptographic digest associated with the node.
 	 */
-	public Node(Interval i) {
-		this.i = i;
+	private final byte[] hash;
+
+	/**
+	 *
+	 */
+	public Node(Interval range, byte[] hash) {
+		this.range = range;
+		this.hash = hash;
 	}
 
 	/**
 	 *
 	 */
 	public Interval getInterval() {
-		return i;
+		return range;
+	}
+
+	/**
+	 *	
+	 */
+	public byte[] getHash() {
+		return hash;
 	}
 
 	/**

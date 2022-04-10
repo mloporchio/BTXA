@@ -14,11 +14,13 @@ JFLAGS=-cp ".:./lib/guava-31.1-jre.jar"
 
 CLASSES = \
 	Geometry.java \
+	Hash.java \
 	Interval.java \
 	IntNode.java \
 	LeafNode.java \
 	Node.java \
 	Record.java \
+	Test.java \
 	Tree.java \
 	Utility.java
 

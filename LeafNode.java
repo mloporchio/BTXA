@@ -14,7 +14,7 @@ public class LeafNode extends Node {
    *  @param data a list of records to be stored in the node
    */
   public LeafNode(List<Record> data) {
-    super(Geometry.intervalFromRecords(data));
+    super(Geometry.intervalFromRecords(data), Hash.fromRecords(data));
     this.data = data;
   }
 
