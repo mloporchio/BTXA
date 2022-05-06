@@ -2,17 +2,20 @@ import java.util.List;
 import com.google.common.hash.*;
 
 /**
+ *  This class contains a set of methods for generating and handling
+ *  cryptographic digests.
  *  @author Matteo Loporchio
  */
 public final class Hash {
 
   /**
-   *
+   *  We choose SHA-256 as our cryptographic hashing algorithm.
    */
   public static final HashFunction hf = Hashing.sha256();
 
   /**
-   *
+   *  @param nodes
+   *  @return
    */
   public static byte[] fromNodes(List<Node> nodes) {
     // Create new hasher instance.
@@ -28,7 +31,8 @@ public final class Hash {
   }
 
   /**
-   *
+   *  @param records
+   *  @return
    */
   public static byte[] fromRecords(List<Record> records) {
     // Create new hasher instance.
@@ -40,7 +44,8 @@ public final class Hash {
   }
 
   /**
-   *
+   *  @param hash
+   *  @return 
    */
   public static String toString(byte[] hash) {
     return HashCode.fromBytes(hash).toString();

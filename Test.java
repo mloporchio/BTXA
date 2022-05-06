@@ -18,7 +18,8 @@ public class Test {
     }
     // Build the tree and print the root hash.
     Node root = Tree.buildPacked(records, c);
-    System.out.printf("Hash: %s\n", Hash.toString(root.getHash()));
+    System.out.printf("Interval: %s\nHash: %s\n",
+    root.getInterval().toString(), Hash.toString(root.getHash()));
   }
 }
 

@@ -2,17 +2,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  *  @author Matteo Loporchio
  */
 public final class Tree {
 
   /**
-   *  This method constructs a Merkle interval tree
-   *  from a given list of records with the packed algorithm.
-   *  The nodes of the tree have a fixed capacity.
+   *  This method constructs an MI-tree from a given list of records
+   *  using the packed algorithm. The nodes of the tree have a fixed capacity.
    *  @param data list of data records
    *  @param c page capacity
-   *  @return the root node of the constructed tree
+   *  @return the tree root
    */
   public static Node buildPacked(List<Record> data, int c) {
     List<Node> current = new ArrayList<Node>();
@@ -37,9 +37,9 @@ public final class Tree {
   }
 
   /**
-   *  This method computes the number of leaves of the tree.
-   *  @param t root of the tree
-   *  @return 
+   *  Computes the number of leaves of the given Merkle interval tree.
+   *  @param t the tree root
+   *  @return the number of leaves of the tree
    */
   public static int leaves(Node t) {
     if (t.isLeaf()) return 1;
@@ -50,7 +50,9 @@ public final class Tree {
   }
 
   /**
-   *
+   *  Computes the height of the given Merkle interval tree.
+   *  @param t the tree root
+   *  @return the tree height
    */
   public static int height(Node t) {
     // If the node is a leaf, there is nothing to compute.

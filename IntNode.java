@@ -5,6 +5,7 @@ import java.util.List;
  *  @author Matteo Loporchio
  */
 public class IntNode extends Node {
+
   /**
    *  An internal node stores a list of references to its children.
    */
@@ -12,7 +13,6 @@ public class IntNode extends Node {
 
   /**
    *  Constructs a new internal node.
-   *  @param range t
    *  @param children a list of children for the internal node
    */
   public IntNode(List<Node> children) {
@@ -29,8 +29,7 @@ public class IntNode extends Node {
   }
 
   /**
-	 *	This method returns true if the current node
-	 *	is a leaf node and false if it is an internal one.
+	 *	Returns true if and only if the current node is a leaf.
 	 *	@return true if the node is a leaf, false otherwise
 	 */
   public boolean isLeaf() {

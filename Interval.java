@@ -24,4 +24,12 @@ public class Interval {
     this.l = l;
     this.u = u;
   }
+
+  /**
+   *  Returns a string representing the current interval.
+   *  @return a string representing the interval
+   */
+  public String toString() {
+    return String.format("[%d, %d]", l, u);
+  }
 }
