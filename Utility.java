@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *  This class contains utility methods for performing various tasks.
  *  @author Matteo Loporchio
  */
 public final class Utility {

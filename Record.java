@@ -1,5 +1,6 @@
 /**
- *
+ *  This interface represents a generic record that can be indexed
+ *  by a Merkle interval tree.
  *  @author Matteo Loporchio
  */
 public interface Record {

@@ -1,1 +1,4 @@
 .DS_Store
+*.class
+data/.ipynb_checkpoints/
+data/env/

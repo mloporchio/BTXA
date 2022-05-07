@@ -4,7 +4,6 @@
  *  @author Matteo Loporchio
  */
 public class VPruned implements VObject {
-  
   /**
    *  The bounding interval of the pruned node.
    */

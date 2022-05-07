@@ -2,11 +2,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ *  This class contains several methods for constructing Merkle interval
+ *  trees and for analyzing their properties.
  *  @author Matteo Loporchio
  */
 public final class Tree {
-
   /**
    *  This method constructs an MI-tree from a given list of records
    *  using the packed algorithm. The nodes of the tree have a fixed capacity.

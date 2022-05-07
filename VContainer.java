@@ -7,7 +7,6 @@ import java.util.List;
  *  @author Matteo Loporchio
  */
 public class VContainer implements VObject {
-
   /**
    *  The list of verification objects in the container.
    */

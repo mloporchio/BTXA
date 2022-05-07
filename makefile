@@ -24,7 +24,6 @@ CLASSES = \
 	Output.java \
 	Query.java \
 	Record.java \
-	Test.java \
 	TestQuery.java \
 	Tree.java \
 	Utility.java \

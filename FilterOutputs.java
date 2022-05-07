@@ -22,41 +22,40 @@ public class FilterOutputs {
     outputFile = args[1];
     long lower = Long.parseLong(args[2]),
     upper = Long.parseLong(args[3]);
-    try (
-      BufferedReader ir = new BufferedReader(new FileReader(inputFile));
-      PrintWriter ow = new PrintWriter(outputFile);
-    ) {
-      ow.println("timestamp,blockId,txId,address,amount,scriptType,offset");
-      String line;
-      while ((line = ir.readLine()) != null) {
-        // Split the line and obtain info and outputs.
-        String[] parts = line.split(":"),
-        infos = parts[0].split(","),
-        outputs = parts[2].split(";");
-        // Parse the associated information.
-        long timestamp = Long.parseLong(infos[0]);
-        long blockId = Long.parseLong(infos[1]);
-        long txId = Long.parseLong(infos[2]);
-        // Extract outputs from TX data.
-        if (!parts[2].equals("")) {
-          for (int offset = 0; offset < outputs.length; offset++) {
-            String[] outputParts = outputs[offset].split(",");
-            long address = Long.parseLong(outputParts[0]);
-            long amount = Long.parseLong(outputParts[1]);
-            int scriptType = Integer.parseInt(outputParts[2]);
-            // Write the TX output to file only if the corresponding
-            // amount is in the desired range.
-            if (lower <= amount && amount <= upper) {
-              ow.printf("%d,%d,%d,%d,%d,%d,%d\n",
-              timestamp, blockId, txId, address, amount, scriptType, offset);
-            }
+    // Open input and output files.
+    BufferedReader ir = new BufferedReader(new FileReader(inputFile));
+    PrintWriter ow = new PrintWriter(outputFile);
+    // Write CSV header.
+    ow.println("timestamp,blockId,txId,address,amount,scriptType,offset");
+    // Read and process the input file.
+    String line;
+    while ((line = ir.readLine()) != null) {
+      // Split the line and obtain info and outputs.
+      String[] parts = line.split(":"),
+      infos = parts[0].split(","),
+      outputs = parts[2].split(";");
+      // Parse the associated information.
+      long timestamp = Long.parseLong(infos[0]);
+      long blockId = Long.parseLong(infos[1]);
+      long txId = Long.parseLong(infos[2]);
+      // Extract outputs from TX data.
+      if (!parts[2].equals("")) {
+        for (int offset = 0; offset < outputs.length; offset++) {
+          String[] outputParts = outputs[offset].split(",");
+          long address = Long.parseLong(outputParts[0]);
+          long amount = Long.parseLong(outputParts[1]);
+          int scriptType = Integer.parseInt(outputParts[2]);
+          // Write the TX output to file only if the corresponding
+          // amount is in the desired range.
+          if (lower <= amount && amount <= upper) {
+            ow.printf("%d,%d,%d,%d,%d,%d,%d\n",
+            timestamp, blockId, txId, address, amount, scriptType, offset);
           }
         }
       }
     }
-    catch (Exception e) {
-      System.err.println("Error: " + e.getMessage());
-      e.printStackTrace();
-    }
+    // Close input and output files.
+    ir.close();
+    ow.close();
   }
 }

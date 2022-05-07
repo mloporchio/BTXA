@@ -1,6 +1,7 @@
 import java.util.List;
 
 /**
+ *  This class contains several methods for dealing with intervals.
  *  @author Matteo Loporchio
  */
 public final class Geometry {

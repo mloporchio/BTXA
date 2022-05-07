@@ -1,6 +1,7 @@
 import java.util.List;
 
 /**
+ *  This class represents a leaf node of the Merkle interval tree.
  *  @author Matteo Loporchio
  */
 public class LeafNode extends Node {

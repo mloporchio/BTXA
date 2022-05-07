@@ -3,12 +3,10 @@ import java.util.List;
 /**
  *  This class represents the output of the verification algorithm.
  *  It contains the result set of the query, the bounding interval
- *  and digest of the MI-tree root, all reconstructed from
- *  the verification object.
+ *  and digest of the Merkle interval tree root.
  *  @author Matteo Loporchio
  */
 public class VResult {
-
   /**
    *  The result set of the query.
    */
@@ -55,15 +53,15 @@ public class VResult {
 
   /**
   * Returns the reconstructed bounding interval for the MI-tree root.
-  * @return the minimum bounding rectangle for the reconstructed root
+  * @return the minimum bounding interval for the reconstructed root
   */
   public Interval getInterval() {
     return range;
   }
 
   /**
-  * Returns the reconstructed digest for the MR-tree root.
-  * @return the hash value of the reconstructed MR-tree root node
+  * Returns the reconstructed digest for the MI-tree root.
+  * @return the hash value of the reconstructed root node
   */
   public byte[] getHash() {
     return hash;

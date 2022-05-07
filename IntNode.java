@@ -1,11 +1,10 @@
 import java.util.List;
 
 /**
- *  This class represents an internal node of the tree.
+ *  This class represents an internal node of the Merkle interval tree.
  *  @author Matteo Loporchio
  */
 public class IntNode extends Node {
-
   /**
    *  An internal node stores a list of references to its children.
    */

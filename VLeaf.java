@@ -7,7 +7,6 @@ import java.util.List;
  *  @author Matteo Loporchio
  */
 public class VLeaf implements VObject {
-  
   /**
    *  The set of records included in the verification object.
    */

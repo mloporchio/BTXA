@@ -2,7 +2,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ *  This class contains several methods for retrieving records from the
+ *  Merkle interval tree and for verifying the results of a query.
  *  @author Matteo Loporchio
  */
 public final class Query {
@@ -12,7 +13,7 @@ public final class Query {
    *  query interval.
    *  @param data the list of records
    *  @param query the query interval
-   *  @return
+   *  @return the list of all records whose key is in the given interval
    */
   public static List<Record> filter(List<Record> data, Interval q) {
     List<Record> result = new ArrayList<>();
@@ -24,8 +25,8 @@ public final class Query {
   }
 
   /**
-   *  This method can be used to query the MI-tree to retrieve all records
-   *  whose key falls in the given interval.
+   *  Queries the Merkle interval tree to retrieve all records whose key
+   *  belongs to the given interval.
    *  @param T the root of the Merkle interval tree
    *  @param q the query interval
    *  @return a VO for the root
@@ -52,7 +53,55 @@ public final class Query {
   }
 
   /**
-   *
+   *  Verifies the correctness of a certain verification object by
+   *  reconstructing the root of the Merkle interval tree.
+   *  The output of this method is a <code>VResult</code> object
+   *  that contains the result set, the bounding interval and
+   *  the cryptographic digest of the root.
+   *  @param vo the verification object
+   *  @returns a <code>VResult</code> object
+   */
+  public static VResult verify(VObject vo) {
+    // Reconstruct a leaf node.
+    if (vo instanceof VLeaf) {
+      List<Record> data = ((VLeaf) vo).getData();
+      Interval range = Geometry.intervalFromRecords(data);
+      byte[] digest = Hash.fromRecords(data);
+      return new VResult(data, range, digest);
+    }
+    // Reconstruct a pruned internal node.
+    if (vo instanceof VPruned) {
+      VPruned pr = ((VPruned) vo);
+      return new VResult(new ArrayList<>(), pr.getInterval(), pr.getHash());
+    }
+    // Otherwise we must reconstruct a non-pruned internal node.
+    // This node is represented by means of a VO container.
+    List<Record> data = new ArrayList<>();
+    List<Interval> intervals = new ArrayList<>();
+    List<byte[]> hashes = new ArrayList<>();
+    // Obtain the VO container.
+    VContainer cont = (VContainer) vo;
+    // Recursively examine each VO in the container.
+    for (int i = 0; i < cont.size(); i++) {
+      VResult partial = verify(cont.get(i));
+      // Take all the matching records and add them to the result set.
+      data.addAll(partial.getData());
+      // Collect all intervals and hashes.
+      intervals.add(partial.getInterval());
+      hashes.add(partial.getHash());
+    }
+    // Reconstruct the bounding interval and digest of the node.
+    Interval range = Geometry.enlarge(intervals);
+    byte[] hash = Hash.fromEntries(intervals, hashes);
+    return new VResult(data, range, hash);
+  }
+
+  /**
+   *  Utility method for extracting matching records directly from
+   *  a verification object.
+   *  @param vo the verification object
+   *  @param q the query
+   *  @return all records in the verification that match the given query
    */
   public static List<Record> filterVO(VObject vo, Interval q) {
     // Filter all records in a leaf.
@@ -71,41 +120,4 @@ public final class Query {
     return result;
   }
 
-  /**
-   *
-   */
-  // public static VResult verify(VObject vo) {
-  //   // Reconstruct a leaf node.
-  //   if (vo instanceof VLeaf) {
-  //     List<Point> records = ((VLeaf) vo).getRecords();
-  //     Rectangle MBR = Geometry.MBR(records);
-  //     byte[] h = Hash.hashPoints(records);
-  //     return new VResult(records, MBR, h);
-  //   }
-  //   // Reconstruct a pruned internal node.
-  //   if (vo instanceof VPruned) {
-  //     VPruned pr = ((VPruned) vo);
-  //     return new VResult(new ArrayList<>(), pr.getInterval(), pr.getHash());
-  //   }
-  //   // Otherwise we must reconstruct a non-pruned internal node.
-  //   // This node is represented by means of a VO container.
-  //   List<Point> records = new ArrayList<Point>();
-  //   List<Rectangle> rects = new ArrayList<Rectangle>();
-  //   List<byte[]> hashes = new ArrayList<byte[]>();
-  //   // Obtain the VO container.
-  //   VContainer cont = (VContainer) vo;
-  //   // Recursively examine each VO in the container.
-  //   for (int i = 0; i < cont.size(); i++) {
-  //     VResult partial = verify(cont.get(i));
-  //     // Take all the matching records and add them to the result set.
-  //     records.addAll(partial.getContent());
-  //     // Collect all rectangles and hashes.
-  //     rects.add(partial.getMBR());
-  //     hashes.add(partial.getHash());
-  //   }
-  //   //
-  //   Rectangle u = Geometry.enlarge(rects);
-  //   byte[] hash = Hash.reconstruct(rects, hashes);
-  //   return new VResult(records, u, hash);
-  // }
 }

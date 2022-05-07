@@ -1,25 +1,41 @@
 import java.io.*;
 import java.util.*;
 
+/**
+ *  This program parses the entire Bitcoin data set and constructs a
+ *  Merkle interval tree for the TX outputs of each block. The tree is
+ *  then queried according to the desired range and the resulting verification
+ *  object is checked. The class produces two different output files:
+ *
+ *  1. A CSV file containing information about all TX outputs that satisfy
+ *  the query.
+ *  2. A CSV file containing statistics about the construction, query and
+ *  verification time for each tree.
+ *
+ *  @author Matteo Loporchio
+ */
 public class TestQuery {
   public static void main(String[] args) throws Exception {
-    if (args.length < 5) {
-      System.err.println("Usage: TestQuery <capacity> <inputFile> <outputFile> <lower> <upper>");
+    if (args.length < 6) {
+      System.err.println("Usage: TestQuery <capacity> <inputFile> <dataFile> <statsFile> <lower> <upper>");
       System.exit(1);
     }
     // Read the input parameters.
     int c = Integer.parseInt(args[0]);
     String inputFile = args[1];
-    String outputFile = args[2];
+    String dataFile = args[2];
+    String statsFile = args[3];
     long lower = Long.parseLong(args[3]);
     long upper = Long.parseLong(args[4]);
     Interval q = new Interval(lower, upper);
     // Open input and output files.
     BufferedReader br = new BufferedReader(new FileReader(inputFile));
-    PrintWriter ow = new PrintWriter(outputFile);
-    ow.printf("timestamp,blockId,txId,address,amount,scriptType,offset\n");
+    PrintWriter dw = new PrintWriter(dataFile);
+    PrintWriter sw = new PrintWriter(statsFile);
+    dw.printf("timestamp,blockId,txId,address,amount,scriptType,offset\n");
+    sw.printf("blockId,constructionTime,queryTime,verificationTime,size,resultSize,min,max\n");
     // Read the input file.
-    long lastBlockId = -1;
+    long tcStart, tcEnd, tqStart, tqEnd, tvStart, tvEnd, lastBlockId = -1;
     String line;
     List<Record> currentOutputs = new ArrayList<>();
     while ((line = br.readLine()) != null) {
@@ -47,18 +63,28 @@ public class TestQuery {
       if (blockId != lastBlockId) {
         if (lastBlockId != -1) {
           // Construct the MI-tree for the current block.
+          tcStart = System.nanoTime();
           Node t = Tree.buildPacked(currentOutputs, c);
+          tcEnd = System.nanoTime();
           // Query the tree using the input interval.
+          tqStart = System.nanoTime();
           VObject vo = Query.query(t, q);
-          // Skip reconstruction and extract matching records directly
-          // from the verification object.
-          List<Record> result = Query.filterVO(vo, q);
+          tqEnd = System.nanoTime();
+          // Verify the result.
+          tvStart = System.nanoTime();
+          VResult vr = Query.verify(vo);
+          tvEnd = System.nanoTime();
           // Write all matching records to the output file.
+          List<Record> result = Query.filter(vr.getData(), q);
           for (Record r : result) {
             Output or = (Output) r;
-            ow.printf("%d,%d,%d,%d,%d,%d,%d\n", or.timestamp, or.blockId,
+            dw.printf("%d,%d,%d,%d,%d,%d,%d\n", or.timestamp, or.blockId,
             or.txId, or.address, or.amount, or.scriptType, or.offset);
           }
+          // Write statistics to the corresponding file.
+          sw.printf("%d,%d,%d,%d,%d,%d,%d,%d\n", blockId, tcEnd-tcStart,
+          tqEnd-tqStart, tvEnd-tvStart, currentOutputs.size(), result.size(),
+          t.getInterval().l, t.getInterval().u);
           // Reinitialize the current outputs container.
           currentOutputs = new ArrayList<>();
         }
@@ -68,6 +94,7 @@ public class TestQuery {
     }
     // Close input and output files.
     br.close();
-    ow.close();
+    dw.close();
+    sw.close();
   }
 }

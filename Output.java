@@ -7,7 +7,7 @@ import com.google.common.primitives.Longs;
  *  It implements the Record interface and uses the amount as query key.
  *  @author Matteo Loporchio
  */
-class Output implements Record {
+public class Output implements Record {
   public final long timestamp;
   public final long blockId;
   public final long txId;
@@ -16,6 +16,16 @@ class Output implements Record {
   public final int scriptType;
   public final int offset;
 
+  /**
+   *  Class constructor.
+   *  @param timestamp the timestamp of the transaction this output belongs to
+   *  @param txId the transaction identifier
+   *  @param blockId
+   *  @param address
+   *  @param amount
+   *  @param scriptType
+   *  @param offset
+   */
   public Output(long timestamp, long txId, long blockId, long address,
   long amount, int scriptType, int offset) {
     this.timestamp = timestamp;
