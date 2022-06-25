@@ -14,28 +14,27 @@ import java.util.*;
  *
  *  @author Matteo Loporchio
  */
-public class TestQuery {
+public class TestScan {
   public static void main(String[] args) throws Exception {
-    if (args.length < 6) {
-      System.err.println("Usage: TestQuery <capacity> <inputFile> <dataFile> <statsFile> <lower> <upper>");
+    if (args.length < 5) {
+      System.err.println("Usage: TestScan <inputFile> <dataFile> <statsFile> <lower> <upper>");
       System.exit(1);
     }
     // Read the input parameters.
-    int c = Integer.parseInt(args[0]);
-    String inputFile = args[1];
-    String dataFile = args[2];
-    String statsFile = args[3];
-    long lower = Long.parseLong(args[4]);
-    long upper = Long.parseLong(args[5]);
+    String inputFile = args[0];
+    String dataFile = args[1];
+    String statsFile = args[2];
+    long lower = Long.parseLong(args[3]);
+    long upper = Long.parseLong(args[4]);
     Interval q = new Interval(lower, upper);
     // Open input and output files.
     BufferedReader br = new BufferedReader(new FileReader(inputFile));
     //PrintWriter dw = new PrintWriter(dataFile);
     PrintWriter sw = new PrintWriter(statsFile);
     //dw.printf("timestamp,blockId,txId,address,amount,scriptType,offset\n");
-    sw.printf("blockId,constructionTime,queryTime,verificationTime,blockCount,voCount,resultCount,min,max\n");
+    sw.printf("blockId,queryTime,blockCount,resultCount\n");
     // Read the input file.
-    long tcStart, tcEnd, tqStart, tqEnd, tvStart, tvEnd, lastBlockId = -1;
+    long tqStart, tqEnd, lastBlockId = -1;
     String line;
     List<Record> currentOutputs = new ArrayList<>();
     while ((line = br.readLine()) != null) {
@@ -62,30 +61,23 @@ public class TestQuery {
       // Check if block identifier has changed since last transaction.
       if (blockId != lastBlockId) {
         if (lastBlockId != -1) {
-          // Construct the MI-tree for the current block.
-          tcStart = System.nanoTime();
-          Node t = Tree.buildPacked(currentOutputs, c);
-          tcEnd = System.nanoTime();
-          // Query the tree using the input interval.
+          // Fetc
+          List<Record> result = new ArrayList<>();
           tqStart = System.nanoTime();
-          VObject vo = Query.query(t, q);
+          for (Record r : currentOutputs) {
+            Output or = (Output) r;
+            if (lower <= or.amount && or.amount <= upper) result.add(r);
+          }
           tqEnd = System.nanoTime();
-          // Verify the result.
-          tvStart = System.nanoTime();
-          VResult vr = Query.verify(vo);
-          tvEnd = System.nanoTime();
           // Write all matching records to the output file.
-          List<Record> result = Query.filter(vr.getData(), q);
           // for (Record r : result) {
           //   Output or = (Output) r;
           //   dw.printf("%d,%d,%d,%d,%d,%d,%d\n", or.timestamp, or.blockId,
           //   or.txId, or.address, or.amount, or.scriptType, or.offset);
           // }
           // Write statistics to the corresponding file.
-          sw.printf("%d,%d,%d,%d,%d,%d,%d,%d,%d\n", blockId, tcEnd-tcStart,
-          tqEnd-tqStart, tvEnd-tvStart, currentOutputs.size(),
-          vr.getData().size(), result.size(),
-          t.getInterval().l, t.getInterval().u);
+          sw.printf("%d,%d,%d,%d\n", blockId, tqEnd-tqStart,
+          currentOutputs.size(), result.size());
           // Reinitialize the current outputs container.
           currentOutputs = new ArrayList<>();
         }

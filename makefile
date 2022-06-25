@@ -12,26 +12,7 @@ JFLAGS=-cp ".:./lib/guava-31.1-jre.jar"
 .java.class:
 	$(JC) $(JFLAGS) $*.java
 
-CLASSES = \
-	FilterInputs.java \
-	FilterOutputs.java \
-	Geometry.java \
-	Hash.java \
-	Interval.java \
-	IntNode.java \
-	LeafNode.java \
-	Node.java \
-	Output.java \
-	Query.java \
-	Record.java \
-	TestQuery.java \
-	Tree.java \
-	Utility.java \
-	VContainer.java \
-	VLeaf.java \
-	VObject.java \
-	VPruned.java \
-	VResult.java
+CLASSES := $(shell find . -name '*.java')
 
 default: classes
 
