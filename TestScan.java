@@ -2,15 +2,15 @@ import java.io.*;
 import java.util.*;
 
 /**
- *  This program parses the entire Bitcoin data set and constructs a
- *  Merkle interval tree for the TX outputs of each block. The tree is
- *  then queried according to the desired range and the resulting verification
- *  object is checked. The class produces two different output files:
+ *  This program performs a linear scan of the entire Bitcoin data set.
+ *  Each block is analyzed to retrieve all transaction outputs
+ *  within the desired query range.
+ *  The program produces two different output files:
  *
  *  1. A CSV file containing information about all TX outputs that satisfy
  *  the query.
- *  2. A CSV file containing statistics about the construction, query and
- *  verification time for each tree.
+ *  2. A CSV file containing statistics about the query process and
+ *  result size.
  *
  *  @author Matteo Loporchio
  */
@@ -29,9 +29,9 @@ public class TestScan {
     Interval q = new Interval(lower, upper);
     // Open input and output files.
     BufferedReader br = new BufferedReader(new FileReader(inputFile));
-    //PrintWriter dw = new PrintWriter(dataFile);
+    PrintWriter dw = new PrintWriter(dataFile);
     PrintWriter sw = new PrintWriter(statsFile);
-    //dw.printf("timestamp,blockId,txId,address,amount,scriptType,offset\n");
+    dw.printf("timestamp,blockId,txId,address,amount,scriptType,offset\n");
     sw.printf("blockId,queryTime,blockCount,resultCount\n");
     // Read the input file.
     long tqStart, tqEnd, lastBlockId = -1;
@@ -70,11 +70,11 @@ public class TestScan {
           }
           tqEnd = System.nanoTime();
           // Write all matching records to the output file.
-          // for (Record r : result) {
-          //   Output or = (Output) r;
-          //   dw.printf("%d,%d,%d,%d,%d,%d,%d\n", or.timestamp, or.blockId,
-          //   or.txId, or.address, or.amount, or.scriptType, or.offset);
-          // }
+          for (Record r : result) {
+            Output or = (Output) r;
+            dw.printf("%d,%d,%d,%d,%d,%d,%d\n", or.timestamp, or.blockId,
+            or.txId, or.address, or.amount, or.scriptType, or.offset);
+          }
           // Write statistics to the corresponding file.
           sw.printf("%d,%d,%d,%d\n", blockId, tqEnd-tqStart,
           currentOutputs.size(), result.size());
